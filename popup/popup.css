@@ -1,0 +1,158 @@
+/* General Body Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    width: 275px;
+    margin: 0;
+    background-color: #222;
+    color: #eee;
+}
+
+
+/* Main Container */
+.container {
+    padding: 16px;
+    text-align: center;
+}
+
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 8px;
+}
+
+h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+
+/* Settings */
+#set-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 10px;
+    padding: 10px;
+    margin: 10px 0px;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+#set-box .set-label {
+    text-align: left;
+}
+
+#set-box .set-input {
+  justify-self: end;
+  text-align: center;
+  width: 50px;
+  border: 2px solid black;
+  background-color: #2b2a33;
+  color: #eee;
+}
+
+
+/* Group ID Stuff */
+#panda-stuff {
+    margin: 10px 0px;
+    padding-top: 10px;
+}
+
+#panda-label {
+    margin: 0px;
+}
+
+#panda-box {
+    border: 2px solid black;
+    width: 228px;
+    height: 25px;
+    font-size: 11px;
+    text-align: center;
+    margin: 5px 0px 10px 0px;
+    background-color: #2b2a33;
+    color: #eee;
+}
+
+
+/* Toggle Switches */
+#toggle-box {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+#status-text {
+    margin-left: 12px;
+    font-weight: 500;
+    justify-self: end;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2b2a33;
+    border: 2px solid black;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 2px;
+    background-color: #eee;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #01b181;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #01b181;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

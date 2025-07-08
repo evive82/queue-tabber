@@ -1,0 +1,40 @@
+{
+    "manifest_version": 2,
+    "name": "QueueTabber",
+    "version": "1.0",
+    "description": "Multi-tab your MTurk queue.",
+    "homepage_url": "https://github.com/evive82/queue-tabber",
+    "icons": {
+        "48": "icons/icon48.png",
+        "96": "icons/icon96.png"
+    },
+    "permissions": [
+        "tabs",
+        "storage",
+        "webRequest",
+        "webRequestBlocking",
+        "https://worker.mturk.com/*"
+    ],
+    "background": {
+        "scripts": [
+            "background.js",
+            "hit-cookie-blocker.js"
+        ]
+    },
+    "browser_action": {
+        "default_icon": "icons/icon48.png",
+        "default_title": "QueueTabber",
+        "default_popup": "popup/popup.html"
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{ef612bc2-e8b6-40e8-bcde-ab4c5c07946c}",
+            "update_url": "https://raw.githubusercontent.com/evive82/queue-tabber/main/updates.json"
+        }
+    },
+    "web_accessible_resources": [
+        "icons/icon48.png",
+        "icons/icon96.png",
+        "sounds/captcha.wav"
+    ]
+}
