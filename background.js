@@ -86,7 +86,7 @@ async function checkQueue() {
 //Main function for catching HITs.
 async function catcher() {
     if (!state.catcherEnabled) {
-        clearInterval(catcher);
+        clearInterval(catcherRunning);
     } else {
         await catchHIT(state.groupId);
     }
@@ -95,7 +95,7 @@ async function catcher() {
 // Main function for managing tabs.
 async function tabber() {
     if (!state.tabberEnabled) {
-        clearInterval(tabber);
+        clearInterval(tabberRunning);
     }
     else if (state.tabs.length < state.queue.length
         && state.tabs.length < state.maxTabs) {
