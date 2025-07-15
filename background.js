@@ -39,6 +39,7 @@ function textToSpeech(text) {
 let checkingQueue = null;
 let catcherRunning = null;
 let tabberRunning = null;
+let waitingToFocusFirst = null;
 
 function setupQueueCheckInterval() {
     if (checkingQueue) {
@@ -67,6 +68,14 @@ function setupTabberInterval() {
     }
 }
 
+function setupFocusFirstInterval() {
+    if (waitingToFocusFirst) return;
+
+    if (state.tabberEnabled && state.tabs.length < 1) {
+        waitingToFocusFirst = setInterval(focusFirstTab, state.refreshRate * 1000);
+    }
+}
+
 async function checkQueue() {
     // getQueueURLs() should return null if queue can't be grabbed for whatever
     // reason. In that case, just keep state.queue as it is.
@@ -90,8 +99,29 @@ async function tabber() {
     }
     else if (state.tabs.length < state.queue.length
         && state.tabs.length < state.maxTabs) {
+        if (state.tabs.length === 0) {
+            setupFocusFirstInterval();
+        }
         const newHIT = findHitForNextTab();
         openTab(newHIT);
+    }
+}
+
+// Focuses the first tab to open when tabber starts opening new HITs.
+function focusFirstTab() {
+    // This shouldn't be running if the tabber isn't running.
+    if (!state.tabberEnabled) {
+        clearInterval(waitingToFocusFirst);
+        waitingToFocusFirst = null;
+    }
+    
+    if (state.tabs.length > 0) {
+        const firstTab = state.tabs[0];
+        const tabIdToFocus = firstTab ? firstTab.tabId : null;
+        browser.tabs.update(tabIdToFocus, { active: true });
+
+        clearInterval(waitingToFocusFirst);
+        waitingToFocusFirst = null;
     }
 }
 
