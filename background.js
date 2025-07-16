@@ -252,7 +252,6 @@ async function findLastTabIndex() {
     return tabs.reduce((maxIndex, tab) => Math.max(maxIndex, tab.index), -1);
 }
 
-
 // Removes tabs from tab array that no longer exist 
 // in queue and are no longer open in the browser.
 async function cleanUpTabs() {
@@ -281,25 +280,35 @@ function findHitForNextTab() {
     return nextHit;
 }
 
+function findNextTabToFocus(tabId) {
+    const index = state.tabs.findIndex(tab => tab.tabId === tabId);
+    const nextTabInLine = state.tabs[index + 1];
+    return nextTabInLine ? nextTabInLine.tabId : null;
+}
+
 async function handleHitSubmission(details) {
     if (!state.tabberEnabled) return;
 
     if (details.method !== 'POST' || details.statusCode !== 302) {
         return;
     }
+    console.log('All good after POST')
 
     // Make sure this is a QueueTabber tab.
     const index = state.tabs.findIndex(tab => tab.tabId === details.tabId);
     if (index === -1) return;
 
-    // Get the next tab to focus before this one is removed.
-    const nextTabInLine = state.tabs[index + 1];
-    const nextTabIdToFocus = nextTabInLine ? nextTabInLine.tabId : null;
+    console.log('Found index:', index)
+
+    const nextTabIdToFocus = findNextTabToFocus(details.tabId);
+
+    console.log('Found next ID to focus:', nextTabIdToFocus)
 
     // Remove this HIT from the queue array, unless it's a captcha.
     const title = await getTabTitle(details.tabId);
     const url = state.tabs[index].url;
     if (title.toLowerCase() !== 'server busy') {
+        console.log('Removing HIT from queue')
         state.lastHitCompleted = url;
         const i = state.queue.indexOf(url);
         state.queue.splice(i, 1);
@@ -307,7 +316,7 @@ async function handleHitSubmission(details) {
 
     // Close tab before the redirect happens.
     browser.tabs.remove(details.tabId).then(() => {
-        // Focus the next tab using the ID we captured earlier.
+        console.log('Closing tab.')
         if (nextTabIdToFocus) {
             browser.tabs.update(nextTabIdToFocus, { active: true });
         }
@@ -372,18 +381,35 @@ async function signedInCheck() {
 
 // --- EVENT LISTENERS ---
 
+let captchaTabId = null;
 function captchaListener(tabId, changeInfo, tab) {
     if (!state.tabberEnabled) return;
 
+    const isManaged = state.tabs.some(tab => tab.tabId === tabId);
+    if (!isManaged) return;
+
     // Check for captcha
     if (changeInfo.title && changeInfo.title.toLowerCase().includes('server busy')) {
-        // Check if the tab is one we are managing
-        const isManaged = state.tabs.some(tab => tab.tabId === tabId);
-        if (isManaged) {
-            captchaSound.play().catch(error =>
-                console.error('Error playing sound:', error)
-            );
-        }
+        captchaSound.play().catch(error =>
+            console.error('Error playing sound:', error)
+        );
+
+        // Set captchaTabId to this tab's ID so listener can pick up when
+        // tab title changes again (presumably after captcha is completed).
+        captchaTabId = tabId;
+    }
+    // Attempt to catch page transition after captcha is completed.
+    else if (changeInfo.title && tabId === captchaTabId
+        && !changeInfo.title.toLowerCase().includes('server busy')) {
+
+        const nextTabIdToFocus = findNextTabToFocus(tabId);
+        browser.tabs.remove(tabId).then(() => {
+            if (nextTabIdToFocus) {
+                browser.tabs.update(nextTabIdToFocus, { active: true });
+            }
+        }).catch(error => console.error("Error removing tab after captcha:", error));
+
+        captchaTabId = null;
     }
 }
 
