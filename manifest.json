@@ -5,8 +5,8 @@
     "description": "Multi-tab your MTurk queue.",
     "homepage_url": "https://github.com/evive82/queue-tabber",
     "icons": {
-        "48": "icons/icon-idle-48.png",
-        "96": "icons/icon-idle-96.png"
+        "48": "icons/icon-enabled-48.png",
+        "96": "icons/icon-enabled-96.png"
     },
     "permissions": [
         "tabs",
@@ -33,8 +33,10 @@
         }
     },
     "web_accessible_resources": [
-        "icons/icon48.png",
-        "icons/icon96.png",
+        "icons/icon-enabled-48.png",
+        "icons/icon-enabled-96.png",
+        "icons/icon-idle-48.png",
+        "icons/icon-idle-96.png",
         "sounds/captcha.wav"
     ]
 }
