@@ -202,11 +202,11 @@ async function getQueueHITs() {
 }
 
 function removeLastHitCompletedFromQueue(queue) {
-    const index = queue.indexOf(state.lastHitCompleted);
+    //const index = queue.indexOf(state.lastHitCompleted);
+    const index = queue.findIndex(hit => hit.url === state.lastHitCompleted);
     if (index === -1) {
         return queue;
     }
-
     queue.splice(index, 1);
     return queue;
 }
@@ -448,6 +448,13 @@ function captchaListener(tabId, changeInfo, tab) {
 
     const isManaged = state.tabs.some(tab => tab.tabId === tabId);
     if (!isManaged) return;
+
+    // Temp queue stuff
+    if (changeInfo.title && changeInfo.title.toLowerCase().includes('your hits queue')) {
+        captchaSound.play().catch(error =>
+            console.error('Error playing sound:', error)
+        );
+    }
 
     // Check for captcha
     if (changeInfo.title && changeInfo.title.toLowerCase().includes('server busy')) {
