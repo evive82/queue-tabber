@@ -78,13 +78,13 @@ function restoreOptions() {
  */
 function updateCatcherToggle(catcherEnabled) {
     catcherToggle.checked = catcherEnabled;
-    catcherText.textContent = catcherEnabled ? 'HIT Catcher Enabled' : 'HIT Catcher Disabled';
+    catcherText.textContent = catcherEnabled ? 'Catcher Enabled' : 'Catcher Disabled';
     catcherText.style.color = catcherEnabled ? '#28a745' : '#dc3545';
 }
 
 function updateTabberToggle(tabberEnabled) {
     tabberToggle.checked = tabberEnabled;
-    tabberText.textContent = tabberEnabled ? 'Tab Manager Enabled' : 'Tab Manager Disabled';
+    tabberText.textContent = tabberEnabled ? 'Tabber Enabled' : 'Tabber Disabled';
     tabberText.style.color = tabberEnabled ? '#28a745' : '#dc3545';
 }
 
@@ -118,12 +118,12 @@ tabberToggle.addEventListener('change', () => {
 browser.storage.onChanged.addListener(async (changes) => {
     if (changes.catcherEnabled && changes.catcherEnabled.newValue === false) {
         catcherToggle.checked = false;
-        catcherText.textContent = 'HIT Catcher Disabled';
+        catcherText.textContent = 'Catcher Disabled';
         catcherText.style.color = '#dc3545';
     }
     if (changes.tabberEnabled && changes.tabberEnabled.newValue === false) {
         tabberToggle.checked = false;
-        tabberText.textContent = 'Tab Manager Disabled';
+        tabberText.textContent = 'Tabber Disabled';
         tabberText.style.color = '#dc3545';
     }
     if (changes.catcherEnabled || changes.tabberEnabled) {
