@@ -17,6 +17,9 @@ const maxQueueInput = document.getElementById('max-queue-input');
 const refreshInput = document.getElementById('refresh-input');
 const queueCheckInput = document.getElementById('queue-check-input');
 const groupIdInput = document.getElementById('panda-box');
+const versionLabel = document.getElementById('version-label');
+
+versionLabel.innerHTML = 'v' + browser.runtime.getManifest().version;
 
 groupIdInput.addEventListener('input', () => {
     // If a link gets pasted in, try to convert it to group ID.
@@ -75,13 +78,13 @@ function restoreOptions() {
  */
 function updateCatcherToggle(catcherEnabled) {
     catcherToggle.checked = catcherEnabled;
-    catcherText.textContent = catcherEnabled ? 'HIT Catcher Enabled' : 'HIT Catcher Disabled';
+    catcherText.textContent = catcherEnabled ? 'Catcher Enabled' : 'Catcher Disabled';
     catcherText.style.color = catcherEnabled ? '#28a745' : '#dc3545';
 }
 
 function updateTabberToggle(tabberEnabled) {
     tabberToggle.checked = tabberEnabled;
-    tabberText.textContent = tabberEnabled ? 'Tab Manager Enabled' : 'Tab Manager Disabled';
+    tabberText.textContent = tabberEnabled ? 'Tabber Enabled' : 'Tabber Disabled';
     tabberText.style.color = tabberEnabled ? '#28a745' : '#dc3545';
 }
 
@@ -112,15 +115,48 @@ tabberToggle.addEventListener('change', () => {
 
 // Listen for the disabling of catcher/tabber coming from background.js,
 // and update the toggles to disabled.
-browser.storage.onChanged.addListener((changes) => {
+browser.storage.onChanged.addListener(async (changes) => {
     if (changes.catcherEnabled && changes.catcherEnabled.newValue === false) {
         catcherToggle.checked = false;
-        catcherText.textContent = 'HIT Catcher Disabled';
+        catcherText.textContent = 'Catcher Disabled';
         catcherText.style.color = '#dc3545';
     }
     if (changes.tabberEnabled && changes.tabberEnabled.newValue === false) {
         tabberToggle.checked = false;
-        tabberText.textContent = 'Tab Manager Disabled';
+        tabberText.textContent = 'Tabber Disabled';
         tabberText.style.color = '#dc3545';
     }
+    if (changes.catcherEnabled || changes.tabberEnabled) {
+        const state = await browser.storage.local.get(
+            [
+                'catcherEnabled',
+                'tabberEnabled'
+            ]
+        )
+
+        if (state.catcherEnabled || state.tabberEnabled) {
+            setEnabledIcon();
+        }
+        else if (!state.catcherEnabled && !state.tabberEnabled) {
+            setIdleIcon();
+        }
+    }
 });
+
+function setIdleIcon() {
+    browser.browserAction.setIcon({
+        path: {
+            48: '../icons/icon-idle-48.png',
+            96: '../icons/icon-idle-96.png'
+        }
+    });
+}
+
+function setEnabledIcon() {
+    browser.browserAction.setIcon({
+        path: {
+            48: '../icons/icon-enabled-48.png',
+            96: '../icons/icon-enabled-96.png'
+        }
+    });
+}

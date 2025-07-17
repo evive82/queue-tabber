@@ -11,7 +11,7 @@ body {
 
 /* Main Container */
 .container {
-    padding: 16px;
+    padding: 15px 15px 5px 15px;
     text-align: center;
 }
 
@@ -92,7 +92,7 @@ h1 {
     grid-template-rows: auto auto;
     align-items: center;
     gap: 10px;
-    padding: 10px;
+    padding: 10px 30px;
 }
 
 #status-text {
@@ -155,4 +155,13 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+/* Footer */
+#footer {
+    padding-top: 5px;
+}
+
+#version-label {
+    font-size: 12px;
 }

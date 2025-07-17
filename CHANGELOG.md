@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Add version number to popup.
+
 ### Fixed
 
 - Tabs containing a captcha now automatically close after completion.
