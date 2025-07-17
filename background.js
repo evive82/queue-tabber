@@ -202,7 +202,6 @@ async function getQueueHITs() {
 }
 
 function removeLastHitCompletedFromQueue(queue) {
-    //const index = queue.indexOf(state.lastHitCompleted);
     const index = queue.findIndex(hit => hit.url === state.lastHitCompleted);
     if (index === -1) {
         return queue;
