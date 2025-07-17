@@ -19,7 +19,7 @@ const queueCheckInput = document.getElementById('queue-check-input');
 const groupIdInput = document.getElementById('panda-box');
 const versionLabel = document.getElementById('version-label');
 
-versionLabel.innerHTML = 'v' + browser.runtime.getManifest().version;
+versionLabel.textContent = 'v' + browser.runtime.getManifest().version;
 
 groupIdInput.addEventListener('input', () => {
     // If a link gets pasted in, try to convert it to group ID.
