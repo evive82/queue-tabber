@@ -449,13 +449,6 @@ function captchaListener(tabId, changeInfo, tab) {
     const isManaged = state.tabs.some(tab => tab.tabId === tabId);
     if (!isManaged) return;
 
-    // Temp queue stuff
-    if (changeInfo.title && changeInfo.title.toLowerCase().includes('your hits queue')) {
-        captchaSound.play().catch(error =>
-            console.error('Error playing sound:', error)
-        );
-    }
-
     // Check for captcha
     if (changeInfo.title && changeInfo.title.toLowerCase().includes('server busy')) {
         captchaSound.play().catch(error =>
