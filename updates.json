@@ -3,6 +3,11 @@
     "{ef612bc2-e8b6-40e8-bcde-ab4c5c07946c}": {
       "updates": [
         {
+          "version": "1.0.2",
+          "update_link": "https://github.com/evive82/queue-tabber/releases/download/v1.0.2/queue-tabber-v1.0.2.xpi",
+          "update_hash": "sha256:e6666662559c3a6e51d0bdbc29e3e7eff82d1319eadc01c833df723d89022ac7"
+        },
+        {
           "version": "1.0.1",
           "update_link": "https://github.com/evive82/queue-tabber/releases/download/v1.0.1/queue-tabber-v1.0.1.xpi",
           "update_hash": "sha256:41a8332ca6342c7a0449a9eaca912d2616a89406dcbc161d6f5f0b02bfaec0c7"
