@@ -322,21 +322,20 @@ function findNextTabToFocus(tabId) {
     const index = state.tabs.findIndex(tab => tab.tabId === tabId);
     const nextTabInLine = state.tabs[index + 1];
 
+    if (!nextTabInLine) return null;
+
     // Find the HIT for the next tab in the queue and
     // ensure that it hasn't just expired.
     const queueIndex = state.queue.findIndex(hit => nextTabInLine.url === hit.url);
     const expired = checkHitForExpire(queueIndex);
 
-    if (nextTabInLine && !expired) {
+    if (!expired) {
         return nextTabInLine.tabId;
     }
     // If there's a next tab but the HIT is expired,
     // then run this again to check the following tab.
-    else if (nextTabInLine && expired) {
+    else if (expired) {
         return findNextTabToFocus(nextTabInLine.tabId);
-    }
-    else {
-        return null;
     }
 }
 
