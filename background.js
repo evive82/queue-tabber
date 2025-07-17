@@ -77,9 +77,9 @@ function setupFocusFirstInterval() {
 }
 
 async function checkQueue() {
-    // getQueueURLs() should return null if queue can't be grabbed for whatever
+    // getQueueHITs() should return null if queue can't be grabbed for whatever
     // reason. In that case, just keep state.queue as it is.
-    state.queue = await getQueueURLs() ?? state.queue;
+    state.queue = await getQueueHITs() ?? state.queue;
     cleanUpTabs();
 }
 
@@ -105,6 +105,7 @@ async function tabber() {
         const newHIT = findHitForNextTab();
         openTab(newHIT);
     }
+    checkTabsForExpires();
 }
 
 // Focuses the first tab to open when tabber starts opening new HITs.
@@ -163,7 +164,7 @@ async function getMturkQueue() {
 }
 
 let queueUpdating = false;
-async function getQueueURLs() {
+async function getQueueHITs() {
     if (queueUpdating) {
         return null;
     }
@@ -177,7 +178,12 @@ async function getQueueURLs() {
         queue.tasks.forEach(task => {
             const url = 'https://worker.mturk.com' + task.task_url;
             const urlFixed = url.split('&')[0].replace('.json', '');
-            tempQueue.push(urlFixed);
+            const hitData = {
+                url: urlFixed,
+                assignment_id: task.assignment_id,
+                deadline: task.deadline
+            }
+            tempQueue.push(hitData);
         });
     }
 
@@ -260,8 +266,39 @@ async function cleanUpTabs() {
     const openTabs = await browser.tabs.query({});
     const openTabIds = openTabs.map(tab => tab.id);
     state.tabs = state.tabs.filter(
-        tab => openTabIds.includes(tab.tabId) && state.queue.includes(tab.url)
+        tab => state.queue.some(hit => hit.url === tab.url)
+               && openTabIds.includes(tab.tabId)
     );
+}
+
+function checkHitForExpire(index) {
+    const hit = state.queue[index];
+    if (!hit || !hit.deadline) return;
+
+    const currentTime = new Date();
+    const deadline = new Date(hit.deadline);
+
+    let expired = false;
+    if (currentTime - deadline > 0) {
+        expired = true;
+    }
+    return expired;
+}
+
+function checkTabsForExpires() {
+    state.tabs.forEach(tab => {
+        // Find the matching HIT in the queue.
+        const assignmentId = tab.url.split('assignment_id=')[1];
+        const index = state.queue.findIndex(
+            hit => hit.assignment_id === assignmentId
+        );
+        
+        const expired = checkHitForExpire(index);
+        if (expired) {
+            const nextTabIdToFocus = findNextTabToFocus(tab.tabId);
+            closeTab(tab.tabId, nextTabIdToFocus);
+        }
+    });
 }
 
 function findHitForNextTab() {
@@ -272,8 +309,9 @@ function findHitForNextTab() {
     let nextHit;
     for (let i = 0; i < state.queue.length; i++) {
         if (state.tabs.length < state.maxTabs 
-           && !tabURLs.includes(state.queue[i])) {
-            nextHit = state.queue[i];
+           && !tabURLs.includes(state.queue[i].url)
+           && !checkHitForExpire(i)) {
+            nextHit = state.queue[i].url;
             break;
         }
     }
@@ -283,7 +321,31 @@ function findHitForNextTab() {
 function findNextTabToFocus(tabId) {
     const index = state.tabs.findIndex(tab => tab.tabId === tabId);
     const nextTabInLine = state.tabs[index + 1];
-    return nextTabInLine ? nextTabInLine.tabId : null;
+
+    // Find the HIT for the next tab in the queue and
+    // ensure that it hasn't just expired.
+    const queueIndex = state.queue.findIndex(hit => nextTabInLine.url === hit.url);
+    const expired = checkHitForExpire(queueIndex);
+
+    if (nextTabInLine && !expired) {
+        return nextTabInLine.tabId;
+    }
+    // If there's a next tab but the HIT is expired,
+    // then run this again to check the following tab.
+    else if (nextTabInLine && expired) {
+        return findNextTabToFocus(nextTabInLine.tabId);
+    }
+    else {
+        return null;
+    }
+}
+
+function closeTab(tabId, nextTabIdToFocus) {
+    browser.tabs.remove(tabId).then(() => {
+        if (nextTabIdToFocus) {
+            browser.tabs.update(nextTabIdToFocus, { active: true });
+        }
+    }).catch(error => console.error("Error removing tab:", error));
 }
 
 async function handleHitSubmission(details) {
@@ -292,35 +354,24 @@ async function handleHitSubmission(details) {
     if (details.method !== 'POST' || details.statusCode !== 302) {
         return;
     }
-    console.log('All good after POST')
 
     // Make sure this is a QueueTabber tab.
     const index = state.tabs.findIndex(tab => tab.tabId === details.tabId);
     if (index === -1) return;
 
-    console.log('Found index:', index)
-
     const nextTabIdToFocus = findNextTabToFocus(details.tabId);
-
-    console.log('Found next ID to focus:', nextTabIdToFocus)
 
     // Remove this HIT from the queue array, unless it's a captcha.
     const title = await getTabTitle(details.tabId);
     const url = state.tabs[index].url;
     if (title.toLowerCase() !== 'server busy') {
-        console.log('Removing HIT from queue')
         state.lastHitCompleted = url;
-        const i = state.queue.indexOf(url);
+        const i = state.queue.findIndex(hit => hit.url === url);
         state.queue.splice(i, 1);
     }
 
     // Close tab before the redirect happens.
-    browser.tabs.remove(details.tabId).then(() => {
-        console.log('Closing tab.')
-        if (nextTabIdToFocus) {
-            browser.tabs.update(nextTabIdToFocus, { active: true });
-        }
-    }).catch(error => console.error("Error removing tab after action:", error));
+    closeTab(details.tabId, nextTabIdToFocus)
 
     // The tabRemovedListener will handle cleaning up the tabs array
 }
@@ -341,7 +392,17 @@ async function catchHIT(groupId) {
         // the request URL will be returned with the response. This leads to
         // the queue array being filled with garbage and messes with the tabs. 
         if (response.ok && response.url.includes(groupId) && response.url !== url) {
-            const newHIT = response.url.split('&')[0];
+            const url = response.url.split('&')[0];
+            const assignmentId = url.split('assignment_id=')[1];
+
+            // HIT deadline can only be retrieved from checking the queue
+            // directly, so leave it null for now and getQueueHITs() can
+            // update it when it runs.
+            const newHIT = {
+                url: url,
+                assignment_id: assignmentId,
+                deadline: null
+            };
             state.queue.push(newHIT);
         } else {
             console.log('QueueTabber: Could not grab HIT:', response.status);
@@ -403,12 +464,7 @@ function captchaListener(tabId, changeInfo, tab) {
         && !changeInfo.title.toLowerCase().includes('server busy')) {
 
         const nextTabIdToFocus = findNextTabToFocus(tabId);
-        browser.tabs.remove(tabId).then(() => {
-            if (nextTabIdToFocus) {
-                browser.tabs.update(nextTabIdToFocus, { active: true });
-            }
-        }).catch(error => console.error("Error removing tab after captcha:", error));
-
+        closeTab(tabId, nextTabIdToFocus);
         captchaTabId = null;
     }
 }

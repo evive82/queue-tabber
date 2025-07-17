@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Tabs containing a captcha now automatically close after completion.
+- Tabs now automatically close when their HIT expires.
+
 ## [1.0.1] - 2025-07-15
 
 ### Added
@@ -10,4 +17,4 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Fix invalid variable names when clearing intervals
+- Fix invalid variable names when clearing intervals.
