@@ -115,7 +115,7 @@ tabberToggle.addEventListener('change', () => {
 
 // Listen for the disabling of catcher/tabber coming from background.js,
 // and update the toggles to disabled.
-browser.storage.onChanged.addListener((changes) => {
+browser.storage.onChanged.addListener(async (changes) => {
     if (changes.catcherEnabled && changes.catcherEnabled.newValue === false) {
         catcherToggle.checked = false;
         catcherText.textContent = 'HIT Catcher Disabled';
@@ -126,4 +126,37 @@ browser.storage.onChanged.addListener((changes) => {
         tabberText.textContent = 'Tab Manager Disabled';
         tabberText.style.color = '#dc3545';
     }
+    if (changes.catcherEnabled || changes.tabberEnabled) {
+        const state = await browser.storage.local.get(
+            [
+                'catcherEnabled',
+                'tabberEnabled'
+            ]
+        )
+
+        if (state.catcherEnabled || state.tabberEnabled) {
+            setEnabledIcon();
+        }
+        else if (!state.catcherEnabled && !state.tabberEnabled) {
+            setIdleIcon();
+        }
+    }
 });
+
+function setIdleIcon() {
+    browser.browserAction.setIcon({
+        path: {
+            48: '../icons/icon-idle-48.png',
+            96: '../icons/icon-idle-96.png'
+        }
+    });
+}
+
+function setEnabledIcon() {
+    browser.browserAction.setIcon({
+        path: {
+            48: '../icons/icon-enabled-48.png',
+            96: '../icons/icon-enabled-96.png'
+        }
+    });
+}
