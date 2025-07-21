@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- Mario should be less excited about captchas when they occur in the focused tab.
+
 ## [1.0.2] - 2025-07-17
 
 ### Added

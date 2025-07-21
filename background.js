@@ -437,11 +437,10 @@ async function signedInCheck() {
 }
 
 
-
 // --- EVENT LISTENERS ---
 
 let captchaTabId = null;
-function captchaListener(tabId, changeInfo, tab) {
+async function captchaListener(tabId, changeInfo, tab) {
     if (!state.tabberEnabled) return;
 
     const isManaged = state.tabs.some(tab => tab.tabId === tabId);
@@ -449,9 +448,12 @@ function captchaListener(tabId, changeInfo, tab) {
 
     // Check for captcha
     if (changeInfo.title && changeInfo.title.toLowerCase().includes('server busy')) {
-        captchaSound.play().catch(error =>
-            console.error('Error playing sound:', error)
-        );
+        // Don't need to alert a captcha in the focused tab.
+        if (!tab.active) {
+            captchaSound.play().catch(error =>
+                console.error('Error playing sound:', error)
+            );
+        }
 
         // Set captchaTabId to this tab's ID so listener can pick up when
         // tab title changes again (presumably after captcha is completed).
