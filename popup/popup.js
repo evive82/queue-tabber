@@ -17,13 +17,14 @@ const maxQueueInput = document.getElementById('max-queue-input');
 const refreshInput = document.getElementById('refresh-input');
 const queueCheckInput = document.getElementById('queue-check-input');
 const groupIdInput = document.getElementById('panda-box');
+const groupIdHistory = document.getElementById('panda-history');
 const versionLabel = document.getElementById('version-label');
 
 versionLabel.textContent = 'v' + browser.runtime.getManifest().version;
 
 groupIdInput.addEventListener('input', () => {
     // If a link gets pasted in, try to convert it to group ID.
-    let input = groupIdInput.value;
+    let input = groupIdInput.value.trim();
     if (input.includes('/projects/')) {
         const match = input.match(/projects\/([^/]+)/);
         input = match ? match[1] : groupIdInput.value;
@@ -61,13 +62,47 @@ function restoreOptions() {
         maxTabs: 5,
         maxHitsInQueue: 10,
         refreshRate: 1,
-        queueCheck: 15
+        queueCheck: 15,
+        pandaHistory: []
     }).then(result => {
         groupIdInput.value = result.groupId;
         maxTabsInput.value = result.maxTabs;
         maxQueueInput.value = result.maxHitsInQueue;
         refreshInput.value = result.refreshRate;
         queueCheckInput.value = result.queueCheck;
+
+        populateGroupIdHistory(result.pandaHistory)
+    });
+}
+
+function populateGroupIdHistory(history) {
+    groupIdHistory.innerHTML = '';
+
+    history.forEach(groupId => {
+        const option = document.createElement('option');
+        option.value = groupId;
+        groupIdHistory.appendChild(option);
+    });
+}
+
+function addGroupIdToHistory(groupId) {
+    if (!groupId) return;
+
+    browser.storage.local.get(['pandaHistory'], (result) => {
+        let history = result['pandaHistory'] || [];
+
+        // Remove if it's already in history and put it back to the front
+        if (history.includes(groupId)) {
+            const index = history.findIndex(id => id === groupId);
+            history.splice(index, 1);
+        }
+        history.unshift(groupId);
+
+        // 3 IDs should be fine.
+        history = history.slice(0, 3);
+        browser.storage.local.set({ ['pandaHistory']: history });
+
+        populateGroupIdHistory(history);
     });
 }
 
@@ -105,6 +140,11 @@ catcherToggle.addEventListener('change', () => {
     const catcherEnabled = catcherToggle.checked;
     browser.storage.local.set({ catcherEnabled: catcherEnabled });
     updateCatcherToggle(catcherEnabled);
+
+    // Save current group ID to history if catcher is starting
+    if (catcherToggle.checked) {
+        addGroupIdToHistory(groupIdInput.value);
+    }
 });
 
 tabberToggle.addEventListener('change', () => {

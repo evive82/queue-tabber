@@ -4,9 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Group ID input now saves up to three previous group IDs.
+
 ### Changed
 
 - Mario should be less excited about captchas when they occur in the focused tab.
+- Popup UI has been resized to make it easier to find previous group IDs in history.
 
 ## [1.0.2] - 2025-07-17
 
