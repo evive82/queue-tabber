@@ -164,4 +164,14 @@ input:checked + .slider:before {
 
 #version-label {
     font-size: 12px;
+    font-weight: bold;
+}
+
+a {
+    color: #eee;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #e4723f;
 }

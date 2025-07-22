@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Group ID input now saves up to three previous group IDs.
+- Add changelog link to version label in popup.
 
 ### Changed
 
