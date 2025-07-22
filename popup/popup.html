@@ -13,9 +13,9 @@
             <h1>QueueTabber</h1>
         </div>
             <div id="set-box">
-            <span class="set-label" id="max-tabs-label">Number of tabs to open</span>
+            <span class="set-label" id="max-tabs-label">Number of tabs to maintain</span>
             <input class="set-input" id="max-tabs-input" type="number" min=1 max=25 title="The number of tabs that QueueTabber should maintain. (Default is 5)">
-            <span class="set-label" id="max-queue-label">Max HITs in queue</span>
+            <span class="set-label" id="max-queue-label">Maximum number of HITs in queue</span>
             <input class="set-input" id="max-queue-input" type="number" min=1 max=25 title="The maximum number of HITs that you would like to maintain in queue. (Default is 10 HITs)">
             <span class="set-label" id="refresh-label">Refresh rate (seconds)</span>
             <input class="set-input" id="refresh-input" type="number" min=0.5 max=10.0 step=0.1 title="This controls the rate at which QueueTabber attempts to accept new HITs. It also affects how quickly tabs open. (Default is 1 second)">
@@ -34,12 +34,12 @@
                 <input type="checkbox" id="catcher-toggle">
                 <span class="slider round"></span>
             </label>
-            <span id="catcher-text">Catcher Disabled</span>
+            <span class="switch-label" id="catcher-text">Catcher Disabled</span>
             <label class="switch">
                 <input type="checkbox" id="tabber-toggle">
                 <span class="slider round"></span>
             </label>
-            <span id="tabber-text">Tabber Disabled</span>
+            <span class="switch-label" id="tabber-text">Tabber Disabled</span>
         </div>
         <div id="footer">
             <a href="https://github.com/evive82/queue-tabber/blob/main/CHANGELOG.md" id="version-label"></a>
