@@ -33,10 +33,6 @@
         }
     },
     "web_accessible_resources": [
-        "icons/icon-enabled-48.png",
-        "icons/icon-enabled-96.png",
-        "icons/icon-idle-48.png",
-        "icons/icon-idle-96.png",
-        "sounds/captcha.wav"
+        "sounds/captcha.ogg"
     ]
 }
