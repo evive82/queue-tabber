@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+
+- Extension icon should now properly reset to idle when logged out.
+
 ## [1.0.3] - 2025-07-21
 
 ### Added

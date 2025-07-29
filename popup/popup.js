@@ -157,14 +157,10 @@ tabberToggle.addEventListener('change', () => {
 // and update the toggles to disabled.
 browser.storage.onChanged.addListener(async (changes) => {
     if (changes.catcherEnabled && changes.catcherEnabled.newValue === false) {
-        catcherToggle.checked = false;
-        catcherText.textContent = 'Catcher Disabled';
-        catcherText.style.color = '#dc3545';
+        updateCatcherToggle(changes.catcherEnabled.newValue);
     }
     if (changes.tabberEnabled && changes.tabberEnabled.newValue === false) {
-        tabberToggle.checked = false;
-        tabberText.textContent = 'Tabber Disabled';
-        tabberText.style.color = '#dc3545';
+        updateTabberToggle(changes.tabberEnabled.newValue);
     }
     if (changes.catcherEnabled || changes.tabberEnabled) {
         const state = await browser.storage.local.get(
@@ -173,7 +169,6 @@ browser.storage.onChanged.addListener(async (changes) => {
                 'tabberEnabled'
             ]
         )
-
         if (state.catcherEnabled || state.tabberEnabled) {
             setEnabledIcon();
         }

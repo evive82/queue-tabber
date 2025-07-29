@@ -145,6 +145,14 @@ function disableCatcherAndTabber() {
     browser.storage.local.set({ tabberEnabled: false });
     state.catcherEnabled = false;
     state.tabberEnabled = false;
+    // popup.js won't be able to set the icon to idle if the popup is closed,
+    // so it needs to be done here if a log out occurs while running.
+    browser.browserAction.setIcon({
+        path: {
+            48: '/icons/icon-idle-48.png',
+            96: '/icons/icon-idle-96.png'
+        }
+    });
 }
 
 async function getMturkQueue() {
@@ -159,6 +167,10 @@ async function getMturkQueue() {
         }
     } catch(error) {
         console.error(error);
+
+        // Check if being signed out is the reason for not getting queue.
+        await signedInCheck();
+
         return null;
     }
 }
