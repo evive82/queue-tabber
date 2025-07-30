@@ -290,7 +290,9 @@ function checkHitForExpire(index) {
     const deadline = new Date(hit.deadline);
 
     let expired = false;
-    if (currentTime - deadline > 0) {
+    // HITs tend to expire ~4 seconds before reaching the time in the deadline.
+    // Considering them expired 3 seconds before deadline to tighten things up.
+    if (currentTime - deadline > -3000) {
         expired = true;
     }
     return expired;

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Extension icon should now properly reset to idle when logged out.
+- Tabs with expiring HITs now close a little closer to the actual expiration time.
 
 ## [1.0.3] - 2025-07-21
 
