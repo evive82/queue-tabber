@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "QueueTabber",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Multi-tab your MTurk queue.",
     "homepage_url": "https://github.com/evive82/queue-tabber",
     "icons": {
